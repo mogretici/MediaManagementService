@@ -7,26 +7,25 @@ phases:
       - timeout 15 sh -c "until docker info; do echo .; sleep 1; done"
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPO_URL
+      - echo log in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username $ECR_LOGIN_USER --password-stdin $ECR_LOGIN_PASS
       - REPOSITORY_URI=$REPO_URL
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image.
-      - echo aws version
+      - echo log in to Amazon ECR...
       - aws --version
-      - docker build -t $REPO_NAME:$IMAGE_TAG .
-      - docker tag $REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t $REPO_NAME .
+      - docker tag $REPO_NAME:latest $REPOSITORY_URI:latest
   post_build:
     commands:
       - echo Build completed on `date`
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - printf '[{"name":"main-service","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - docker push $REPOSITORY_URI:latest
+      - printf '[{"name":"main-service","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
 artifacts:
-  files:
-    - imagedefinitions.json
+  files: imagedefinitions.json
 
 cache:
   paths:
