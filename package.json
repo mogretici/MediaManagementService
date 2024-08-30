@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "nest start",
     "docker:build": " docker build -t media-management-service . && docker image prune -f && docker container prune -f",
     "docker:run": "docker run -d -p 3001:3001 media-management-service"
   },
