@@ -73,7 +73,6 @@ async function bootstrap(): Promise<{ port: number }> {
     const options: Omit<OpenAPIObject, 'paths'> = new DocumentBuilder()
       .setTitle('Swagger')
       .setVersion('1.0')
-      .addServer(appConfig.baseUrl)
       .addBearerAuth({ in: 'header', type: 'http' })
       .build();
     const document: OpenAPIObject = SwaggerModule.createDocument(app, options);
@@ -120,10 +119,11 @@ async function bootstrap(): Promise<{ port: number }> {
   }
 
   await app.listen(appConfig.port);
-
+  const url = await app.getUrl();
+  Logger.log(`Running in ${url}`, 'Bootstrap');
   return appConfig;
 }
 
 bootstrap().then((appConfig) => {
-  Logger.log(`Running in http://localhost:${appConfig.port}`, 'Bootstrap');
+  Logger.log(`Server running on port ${appConfig.port}`, 'Bootstrap');
 });

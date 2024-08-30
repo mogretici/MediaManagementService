@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import swaggerConfig from '@config/swagger.config';
 import s3Config from '@config/s3.config';
 import S3Module from '@providers/s3/s3.module';
+import { FileUploadModule } from '@modules/file-upload/file-upload.module';
 
 @Module({
   controllers: [],
@@ -13,6 +14,7 @@ import S3Module from '@providers/s3/s3.module';
       load: [appConfig, swaggerConfig, s3Config],
     }),
     S3Module,
+    FileUploadModule
   ],
   providers: [
   ],
