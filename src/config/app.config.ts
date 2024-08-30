@@ -15,7 +15,7 @@ function parseLogLevel(level: string | undefined): string[] {
 }
 
 export default registerAs('app', () => ({
-  port: SafeEnvVar('APP_PORT'),
+  port: SafeEnvVar('APP_PORT') || 3001,
   baseUrl: SafeEnvVar('BASE_URL'),
   loggerLevel: parseLogLevel(SafeEnvVar('APP_LOGGER_LEVEL')),
   env: SafeEnvVar('NODE_ENV'),
