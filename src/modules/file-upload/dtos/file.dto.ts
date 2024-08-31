@@ -49,12 +49,4 @@ export class FileDto  {
   })
   @IsOptional()
   url: string | null;
-
-  @ApiProperty({
-    description: 'File thumb url',
-    required: false,
-    type: 'string',
-  })
-  @IsOptional()
-  thumbUrl: string | null;
 }

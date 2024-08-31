@@ -4,7 +4,9 @@ import { ConfigModule } from '@nestjs/config';
 import swaggerConfig from '@config/swagger.config';
 import s3Config from '@config/s3.config';
 import S3Module from '@providers/s3/s3.module';
-import { FileUploadModule } from '@modules/file-upload/file-upload.module';
+import { FileUploadModule } from '@modules/file-upload/fileUpload.module';
+import { DynamooseModule } from 'nestjs-dynamoose';
+
 
 @Module({
   controllers: [],
@@ -13,10 +15,11 @@ import { FileUploadModule } from '@modules/file-upload/file-upload.module';
       isGlobal: true,
       load: [appConfig, swaggerConfig, s3Config],
     }),
+    DynamooseModule.forRoot(),
     S3Module,
-    FileUploadModule
+    FileUploadModule,
   ],
-  providers: [
-  ],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule {
+}
