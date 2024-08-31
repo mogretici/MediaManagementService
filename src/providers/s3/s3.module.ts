@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { S3Service } from '@providers/s3/s3.service';
+import { S3Repository } from '@providers/s3/s3.repository';
 
 /**
  * @desc S3 module for uploading files to S3 bucket (min.io)
@@ -14,7 +15,8 @@ import { S3Service } from '@providers/s3/s3.service';
 @Global()
 @Module({
   imports: [ConfigModule],
-  providers: [S3Service],
+  providers: [S3Service, S3Repository],
   exports: [S3Service],
 })
-export default class S3Module {}
+export default class S3Module {
+}

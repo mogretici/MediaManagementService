@@ -75,7 +75,7 @@ export const INVALID_VERIFICATION_CODE = '400024: Invalid verification code';
 export const AUTH_CREDENTIALS_INVALID =
   '400025: Authentication credentials were missing or incorrect';
 export const PHONE_OR_EMAIL_IS_REQUIRED = '400026: Phone or email is required';
-export const USER_CANT_BE_GUARDIAN = "400027: User can't be guardian";
+export const USER_CANT_BE_GUARDIAN = '400027: User can\'t be guardian';
 export const GUARDIAN_LIMIT_REACHED = '400028: Guardian limit reached';
 export const ORGANIZATION_TYPE_TOURNAMENT =
   '400029: Organization type should be tournament';
@@ -119,9 +119,9 @@ export const CAN_NOT_FOLLOW = '409024: Can not follow';
 export const CAN_NOT_UNFOLLOW = '409025: Can not unfollow';
 export const USER_ALREADY_FOLLOWING = '409026: User already following';
 export const INVITE_NOT_AVAILABLE = '409026: Invite not available';
-
+export const UNSUPPORTED_MEDIA_TYPE = '409027: Unsupported media type';
 export const RATE_LIMIT_EXCEEDED = '429000: Rate limit exceeded';
-
+export const NOT_ACCEPTABLE = '406000: Not acceptable';
 export const VALIDATION_ERROR = '422000: Validation error';
 
 export const INTERNAL_SERVER_ERROR = '500000: Internal server error';

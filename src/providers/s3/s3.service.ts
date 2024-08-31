@@ -1,16 +1,14 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  HeadObjectCommand,
-  PutObjectCommand,
+  BadRequestException,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+  UnsupportedMediaTypeException,
+} from '@nestjs/common';
+import {
   PutObjectCommandOutput,
-  S3Client,
 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import * as process from 'process';
-import { GenerateUUID } from '@helpers/generateUUID';
-import { ConfigService } from '@nestjs/config';
+import { S3Repository } from '@providers/s3/s3.repository';
 
 export interface UploadFileResponse extends PutObjectCommandOutput {
   id: string;
@@ -21,24 +19,10 @@ export interface UploadFileResponse extends PutObjectCommandOutput {
  */
 @Injectable()
 export class S3Service {
-  private readonly s3Client: S3Client;
-  client!: S3Client;
 
-  config;
-
-  constructor(private configService: ConfigService) {
-    this.config = this.configService.get('s3');
-
-    if (!this.config.accessKeyId) {
-      throw new Error('S3 accessKeyId is not defined');
-    }
-    this.s3Client = new S3Client({
-      region: this.configService.get('s3.region'),
-      credentials: {
-        accessKeyId: this.configService.get('s3.accessKeyId'),
-        secretAccessKey: this.configService.get('s3.secretAccessKey'),
-      },
-    });
+  constructor(
+    private readonly s3Repository: S3Repository,
+  ) {
   }
 
   /**
@@ -49,57 +33,43 @@ export class S3Service {
   async uploadFile(
     file: Express.Multer.File,
   ): Promise<UploadFileResponse> {
+
     if (!file) {
       console.log('AWS SDK Service: No file provided.');
     }
 
-    // Generate a unique id for the file.
-    const id = GenerateUUID();
+    if (file.size > 10000000) { // 10MB
+      throw new NotAcceptableException('File size must be less than 10MB. Your files size: ' + (file.size / 1000000).toFixed(2) + 'MB');
+      // throw new BadRequestException('File size must be less than 10MB. Your files size: ' + (file.size / 1000000).toFixed(2) + 'MB');
+    }
 
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'video/mp4',
+      'application/pdf',
+    ];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new UnsupportedMediaTypeException('Invalid file type. Allowed types are: image/jpeg, image/png, image/gif, image/webp, video/mp4, application/pdf');
+    }
     // Upload file to S3 bucket and return the response.
-    return {
-      ...(await this.s3Client.send(
-        new PutObjectCommand({
-          Bucket: this.configService.get('s3.bucketName'),
-          Key: `${id}`,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        }),
-      )),
-      id: `${id}`,
-    };
+    try {
+      return await this.s3Repository.uploadFile(file);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   async findAndDeleteFile(id: string) {
     try {
-      const file = await this.getFile(`${id}`);
-      // Remove file from S3 bucket.
-      const deleteParams = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: `${id}`,
-      };
-
-      const data = await this.s3Client.send(
-        new DeleteObjectCommand(deleteParams),
-      );
-      console.log('Successfully deleted file.', data);
+      await this.s3Repository.deleteFile(`${id}`);
     } catch (e) {
-      throw new BadRequestException(e);
+      throw new NotFoundException(e.message);
     }
   }
 
-  async getFile(path: string) {
-    try {
-      const command = new HeadObjectCommand({
-        Bucket: this.configService.get('s3.bucketName'),
-        Key: path,
-      });
-
-      return await this.s3Client.send(command);
-    } catch (e) {
-      throw new NotFoundException('File not found');
-    }
-  }
 
   /**
    * Creates a presigned url for the given fullPath. The url expires after the given amount of seconds.
@@ -115,14 +85,6 @@ export class S3Service {
     contentType?: string,
   ) {
     const extension = fileName?.split('.').pop();
-    const command = new GetObjectCommand({
-      Bucket: this.configService.get('s3.bucketName'),
-      Key: fullPath,
-      ResponseContentType: contentType || 'application/octet-stream',
-      ResponseContentDisposition: `filename="${fileName}.${extension}"`,
-    });
-    return await getSignedUrl(this.s3Client, command, {
-      expiresIn: parseInt(this.configService.get('s3.signExpires') || '300'),
-    });
+    return await this.s3Repository.createPresignedUrl(fullPath, fileName, contentType, extension);
   }
 }

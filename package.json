@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "MediaManagementService",
   "version": "0.0.1",
-  "description": "",
+  "description": "Media Management Service for managing media files",
   "author": "mogretici",
   "private": true,
   "license": "MIT",

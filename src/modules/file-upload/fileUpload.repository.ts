@@ -32,6 +32,22 @@ export class FileUploadRepository {
     }
   }
 
+  async getFile(id: string) {
+    try {
+      return await this.fileModel.get({ id });
+    } catch (error) {
+      throw new NotFoundException(`File not found: ${error.message}`);
+    }
+  }
+
+  async getAllFiles() {
+    try {
+      return await this.fileModel.scan().exec();
+    } catch (error) {
+      throw new NotFoundException(`Files not found: ${error.message}`);
+    }
+  }
+
   async deleteFile(id: string) {
     try {
       await this.fileModel.delete({ id });
@@ -40,11 +56,5 @@ export class FileUploadRepository {
     }
   }
 
-  async getFile(id: string) {
-    try {
-      return await this.fileModel.get({ id });
-    } catch (error) {
-      throw new NotFoundException(`File not found: ${error.message}`);
-    }
-  }
+
 }

@@ -14,6 +14,8 @@ import { AccessExceptionFilter } from '@filters/access-exception.filter';
 import { NotFoundExceptionFilter } from '@filters/not-found-exception.filter';
 import * as dynamoose from 'dynamoose';
 import { SafeEnvVar } from '@helpers/safeEnvVar';
+import { UnsupportedMediaExceptionFilter } from '@filters/unsupported-media-exception.filter';
+import { NotAcceptableExceptionFilter } from '@filters/not-acceptable-exception.filter';
 
 async function bootstrap(): Promise<{ port: number }> {
   /**
@@ -84,7 +86,7 @@ async function bootstrap(): Promise<{ port: number }> {
     const options: Omit<OpenAPIObject, 'paths'> = new DocumentBuilder()
       .setTitle('MediaManagementService')
       .setVersion('1.0')
-      .addBearerAuth({ in: 'header', type: 'http' })
+      // .addBearerAuth({ in: 'header', type: 'http' })
       .build();
     const document: OpenAPIObject = SwaggerModule.createDocument(app, options);
 
@@ -126,6 +128,8 @@ async function bootstrap(): Promise<{ port: number }> {
       new BadRequestExceptionFilter(),
       new ValidationExceptionFilter(),
       new ThrottlerExceptionsFilter(),
+      new UnsupportedMediaExceptionFilter(),
+      new NotAcceptableExceptionFilter(),
     );
   }
 

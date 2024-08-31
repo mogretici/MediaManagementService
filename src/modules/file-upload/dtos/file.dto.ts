@@ -1,5 +1,6 @@
 import { IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
 
 export class FileDto {
   @ApiProperty({
@@ -8,6 +9,7 @@ export class FileDto {
     type: 'string',
   })
   @IsOptional()
+  @Expose()
   id: string | null;
 
   @ApiProperty({
@@ -16,6 +18,7 @@ export class FileDto {
     type: Date,
   })
   @IsOptional()
+  @Expose()
   timestamp: Date | null;
 
   @ApiProperty({
@@ -24,6 +27,7 @@ export class FileDto {
     type: 'string',
   })
   @IsOptional()
+  @Expose()
   filename: string | null;
 
   @ApiProperty({
@@ -32,6 +36,7 @@ export class FileDto {
     type: 'string',
   })
   @IsOptional()
+  @Expose()
   type: string | null;
 
   @ApiProperty({
@@ -41,6 +46,7 @@ export class FileDto {
     type: 'number',
   })
   @IsOptional()
+  @Expose()
   size: number | null;
 
   @ApiProperty({
@@ -49,5 +55,6 @@ export class FileDto {
     type: 'string',
   })
   @IsOptional()
+  @Expose()
   url: string | null;
 }

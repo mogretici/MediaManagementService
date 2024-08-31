@@ -6,30 +6,29 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { plainToInstance } from 'class-transformer';
 import { getSerializeType } from '@decorators/serialize.decorator';
-
-const getSerializer = (Entity: any) => (data: any) =>
-  Object.assign(new Entity(), data);
 
 @Injectable()
 export class SerializeInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    const serializeType = getSerializeType(context.getHandler());
+
     return next.handle().pipe(
       map((value) => {
-        if (typeof value !== 'object' || value === null) {
+        if (!serializeType || typeof value !== 'object' || value === null) {
           return value;
         }
 
-        const SerializeType = getSerializeType(context.getHandler());
-        const serializer = getSerializer(SerializeType);
-
         function serialize(data: any) {
-          return data instanceof Array
-            ? data.map(serializer)
-            : serializer(data);
+          return plainToInstance(serializeType, data, {
+            excludeExtraneousValues: true,
+          });
         }
 
-        if (value.meta) {
+        if (Array.isArray(value)) {
+          return value.map(serialize);
+        } else if (value.meta) {
           return {
             ...value,
             data: serialize(value.data),
