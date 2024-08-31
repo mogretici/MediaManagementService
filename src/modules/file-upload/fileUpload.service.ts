@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { S3Service } from '@providers/s3/s3.service';
 import { FileUploadRepository } from '@modules/file-upload/fileUpload.repository';
-import { ApiOkResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class FileUploadService {
@@ -26,7 +25,7 @@ export class FileUploadService {
   }
 
   async deleteFile(id: string) {
-    const deleted = await this.s3Service.findAndDeleteFile(id);
+    await this.s3Service.findAndDeleteFile(id);
     await this.fileUploadRepository.deleteFile(id);
     return `Successfully deleted file ID: ${id}`;
   }
