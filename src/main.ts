@@ -71,14 +71,14 @@ async function bootstrap(): Promise<{ port: number }> {
     );
 
     const options: Omit<OpenAPIObject, 'paths'> = new DocumentBuilder()
-      .setTitle('Swagger')
+      .setTitle('MediaManagementService')
       .setVersion('1.0')
       .addBearerAuth({ in: 'header', type: 'http' })
       .build();
     const document: OpenAPIObject = SwaggerModule.createDocument(app, options);
 
     SwaggerModule.setup('swagger', app, document, {
-      customSiteTitle: 'Swagger',
+      customSiteTitle: 'Swagger API Documentation',
       swaggerOptions: {
         filter: true,
         showExtensions: true,
