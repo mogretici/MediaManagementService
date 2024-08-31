@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import appConfig from '@config/app.config';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import swaggerConfig from '@config/swagger.config';
 import s3Config from '@config/s3.config';
 import S3Module from '@providers/s3/s3.module';
@@ -16,15 +16,7 @@ import { SafeEnvVar } from '@helpers/safeEnvVar';
       isGlobal: true,
       load: [appConfig, swaggerConfig, s3Config],
     }),
-    DynamooseModule.forRootAsync({
-      useFactory: () => ({
-        aws: {
-          accessKeyId: SafeEnvVar('S3_ACCESS_KEY_ID'),
-          secretAccessKey: SafeEnvVar('S3_SECRET_ACCESS_KEY'),
-          region: SafeEnvVar('S3_REGION'),
-        },
-      }),
-    }),
+    DynamooseModule.forRoot(),
     S3Module,
     FileUploadModule,
   ],

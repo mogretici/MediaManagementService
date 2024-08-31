@@ -7,6 +7,7 @@ import { UploadFileResponse } from '@providers/s3/s3.service';
 export class FileUploadRepository {
   constructor(
     @InjectModel('File')
+
     private fileModel: Model<File, FileKey>,
   ) {
   }

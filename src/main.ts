@@ -12,6 +12,8 @@ import { ThrottlerExceptionsFilter } from '@filters/throttler-exception.filter';
 import { TransformInterceptor } from '@interceptors/transform.interceptor';
 import { AccessExceptionFilter } from '@filters/access-exception.filter';
 import { NotFoundExceptionFilter } from '@filters/not-found-exception.filter';
+import * as dynamoose from 'dynamoose';
+import { SafeEnvVar } from '@helpers/safeEnvVar';
 
 async function bootstrap(): Promise<{ port: number }> {
   /**
@@ -21,6 +23,15 @@ async function bootstrap(): Promise<{ port: number }> {
     cors: true,
     bodyParser: true,
   });
+
+  const dynamoDb = new dynamoose.aws.ddb.DynamoDB({
+    region: SafeEnvVar('S3_REGION'),
+    credentials: {
+      accessKeyId: SafeEnvVar('S3_ACCESS_KEY_ID'),
+      secretAccessKey: SafeEnvVar('S3_SECRET_ACCESS_KEY'),
+    },
+  });
+  dynamoose.aws.ddb.set(dynamoDb);
 
   const configService: ConfigService<any, boolean> = app.get(ConfigService);
   const appConfig = configService.get('app');
